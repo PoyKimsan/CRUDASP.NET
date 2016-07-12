@@ -318,11 +318,17 @@ namespace CRUD_ASP.NET
                     using (StringWriter strwritter = new StringWriter())
                     {
                         HtmlTextWriter htmltextwrtter = new HtmlTextWriter(strwritter);
+                        grdStudentDetail.AllowPaging = false;
+                        grdStudentDetail.ShowHeader = false;
                         Response.Cache.SetCacheability(HttpCacheability.NoCache);
                         Response.ContentType = "application/vnd.ms-excel";
                         Response.AddHeader("Content-Disposition", "attachment;filename=" + FileName);
                         grdStudentDetail.GridLines = GridLines.Both;
                         grdStudentDetail.HeaderStyle.Font.Bold = true;
+                        for (int i = 0; i <= 2; i++)
+                        {
+                            grdStudentDetail.Columns[i].Visible = false;
+                        }
                         grdStudentDetail.RenderControl(htmltextwrtter);
                         Response.Write(strwritter.ToString());
                         Response.End();
@@ -346,6 +352,9 @@ namespace CRUD_ASP.NET
                         Response.AddHeader("Content-Disposition", "attachment;filename=" + FileName);
                         grdStudentDetail.GridLines = GridLines.Both;
                         grdStudentDetail.HeaderStyle.Font.Bold = true;
+                        for (int i = 0; i <= 2; i++){
+                            grdStudentDetail.Columns[i].Visible = false;
+                        }
                         grdStudentDetail.RenderControl(htmltextwrtter);
                         Response.Write(strwritter.ToString());
                         Response.End();
