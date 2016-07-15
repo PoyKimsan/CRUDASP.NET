@@ -78,13 +78,19 @@
             <Columns>
                 <asp:CommandField ShowEditButton="True" HeaderText="Action Editing" />
                 <asp:CommandField ShowDeleteButton="True" HeaderText="Action Deleting"  />
-				<asp:TemplateField HeaderText="Select">
+				<asp:TemplateField>
+					<HeaderTemplate>
+						Select All:
+						<asp:CheckBox ID="chkboxSelectAll" AutoPostBack="true" OnCheckedChanged="chkboxSelectAll_CheckedChanged"
+							runat="server" />
+					</HeaderTemplate>
 					<ItemTemplate>
-						<asp:CheckBox ID="checkboxdelete" runat="server" />
+						<asp:CheckBox ID="chkSelect" runat="server" />
 					</ItemTemplate>
 				</asp:TemplateField>
                 <asp:BoundField DataField="ID" HeaderText="ID" ReadOnly="True" 
                     SortExpression="ID" />
+				
                 <asp:TemplateField HeaderText="FirstName" SortExpression="FirstName">
                     <EditItemTemplate>
                         <asp:TextBox ID="grdFirstName" runat="server" Text='<%# Bind("FirstName") %>'></asp:TextBox>
@@ -131,8 +137,7 @@
             </Columns>
 		</asp:GridView>
 	</ContentTemplate></asp:UpdatePanel>
-	<asp:HiddenField ID="hfCount" runat="server" Value = "0" />
 				<asp:Button ID="btnDelete" runat="server" Text="Delete Checked Records" 
-				   OnClientClick = "return ConfirmDelete();" OnClick="btnDelete_Click" />
-				<asp:Button ID="btnExport" runat="server" Text="Export To Excel" OnClick = "ExportToExcel" />
+				   OnClientClick = 'return confirm("Are you sure you want to delete this students from the list?");' OnClick="btnDelete_Click" CssClass="btn-danger" />
+				<asp:Button ID="btnExport" runat="server" Text="Export To Excel" OnClick = "ExportToExcel" CssClass="btn-primary"/>
 </asp:Content>

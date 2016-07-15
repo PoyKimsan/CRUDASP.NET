@@ -27,6 +27,9 @@ namespace CRUD_ASP.NET
                 GridViewBinding();
             }
         }
+        public override void VerifyRenderingInServerForm(Control control)
+        {
+        }
 
         private void GridViewBinding()
         {
@@ -39,16 +42,8 @@ namespace CRUD_ASP.NET
                     string sqlQuery = "SELECT ID, FirstName, LastName, DateOfBirth, PhoneNumber, Email From Students";
 
                     SqlCommand cmd = new SqlCommand(sqlQuery, conn);
-                    SqlDataReader sudents = cmd.ExecuteReader();
-
-                    dt.Columns.Add("ID", typeof(int));
-                    int i = 1;
-                    foreach (DataRow row in dt.Rows)
-                    {
-                        row["ID"] = i;
-                        i++;
-                    }
-                    dt.Load(sudents);
+                    SqlDataReader students = cmd.ExecuteReader();
+                    dt.Load(students);
                     grdStudentDetail.DataSource = dt;
                     grdStudentDetail.DataBind();
 
@@ -97,6 +92,7 @@ namespace CRUD_ASP.NET
                     GridViewBinding();
 
                 }
+                ClearForm();
             }
             catch (SqlException exception)
             {
@@ -197,7 +193,7 @@ namespace CRUD_ASP.NET
 
                 if (e.Row.RowState == DataControlRowState.Normal || e.Row.RowState == DataControlRowState.Alternate)
                 {
-                    ((LinkButton)e.Row.Cells[1].Controls[0]).Attributes["onclick"] = "if(!confirm('Are you certain you want to delete this person ?')) return false;";
+                    ((LinkButton)e.Row.Cells[1].Controls[0]).Attributes["onclick"] = "if(!confirm('Are you certain you want to delete this student ?')) return false;";
                 }
             }
         }
@@ -239,65 +235,58 @@ namespace CRUD_ASP.NET
         {
             
         }
-       
-
+        protected void chkboxSelectAll_CheckedChanged(object sender, EventArgs e)
+        {
+            CheckBox ChkBoxHeader = (CheckBox)grdStudentDetail.HeaderRow.FindControl("chkboxSelectAll");
+            foreach (GridViewRow row in grdStudentDetail.Rows)
+            {
+                CheckBox ChkBoxRows = (CheckBox)row.FindControl("chkSelect");
+                if (ChkBoxHeader.Checked == true)
+                {
+                    ChkBoxRows.Checked = true;
+                }
+                else
+                {
+                    ChkBoxRows.Checked = false;
+                }
+            }
+        }
         protected void btnDelete_Click(object sender, EventArgs e)
         {
+            int count = 0;
 
             for (int i = 0; i < grdStudentDetail.Rows.Count; i++)
             {
-                CheckBox checkboxdelete = ((CheckBox)grdStudentDetail.Rows[i].FindControl("checkboxdelete"));
-
+                CheckBox checkboxdelete = ((CheckBox)grdStudentDetail.Rows[i].FindControl("chkSelect"));
+               
                 if (checkboxdelete.Checked == true)
                 {
-                    Label lblrollno = ((Label)grdStudentDetail.Rows[i].FindControl("lblrollno"));
+                    
+                    int ID = Convert.ToInt32(grdStudentDetail.Rows[i].Cells[3].Text);
+                    using (SqlConnection conn = new SqlConnection(ConnectionString))
+                    {
 
-                    int rolNo = Convert.ToInt32(lblrollno.Text);
-                    SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["cn"].ConnectionString);
-                    SqlCommand cmd = new SqlCommand("delete from student where rollno = @rollno ", con);
-                    cmd.CommandType = CommandType.Text;
+                        SqlCommand cmd = new SqlCommand();
 
-                    SqlParameter param = new SqlParameter("@rollno", SqlDbType.Int);
-                    param.Value = rolNo;
-                    cmd.Parameters.Add(param);
-                    con.Open();
-                    cmd.ExecuteNonQuery();
-                    con.Close();
-                    cmd.Dispose();
+                        cmd.Connection = conn;
+
+                        cmd.CommandText = "DELETE FROM Students WHERE ID = @ID";
+
+                        cmd.CommandType = CommandType.Text;
+
+                        cmd.Parameters.Add("@ID", SqlDbType.Int).Value = ID;
+
+                        conn.Open();
+
+                        cmd.ExecuteNonQuery();
+                        cmd.Dispose();
+                    }
+                    count++;
                 }
-            } 
-            //int count = 0;
-            //grdStudentDetail.AllowPaging = false;
-            //grdStudentDetail.DataBind();
-            //ArrayList arr = (ArrayList)ViewState["SelectedRecords"];
-            //count = arr.Count;
-            //for (int i = 0; i < grdStudentDetail.Rows.Count; i++)
-            //{
-            //    if (arr.Contains(grdStudentDetail.DataKeys[i].Value))
-            //    {
-            //        DeleteRecord(grdStudentDetail.DataKeys[i].Value.ToString());
-            //        arr.Remove(grdStudentDetail.DataKeys[i].Value);
-            //    }
-            //}
-            //ViewState["SelectedRecords"] = arr;
-            //hfCount.Value = "0";
-            //grdStudentDetail.AllowPaging = true;
-            //GridViewBinding();
-            //ShowMessage(count);
-        }
-
-        private void DeleteRecord(string CustomerID)
-        {
-            string constr = ConfigurationManager
-                        .ConnectionStrings["conString"].ConnectionString;
-            string query = "delete from TestCustomers " +
-                            "where CustomerID=@CustomerID";
-            SqlConnection con = new SqlConnection(constr);
-            SqlCommand cmd = new SqlCommand(query, con);
-            cmd.Parameters.AddWithValue("@CustomerID", CustomerID);
-            con.Open();
-            cmd.ExecuteNonQuery();
-            con.Close();
+                
+            }
+            ShowMessage(count);
+            GridViewBinding();
         }
 
         private void ShowMessage(int count)
