@@ -32,6 +32,9 @@
 					</td>
 					<td>
 						<asp:TextBox ID="txtDateOfBirth" runat="server"></asp:TextBox>
+						<ajaxToolkit:CalendarExtender ID="CalendarExtender1" runat="server" TargetControlID="txtDateOfBirth" 
+							 Format="dd/MM/yyyy">
+						</ajaxToolkit:CalendarExtender>
 					</td>
 				</tr>
 				<tr>
@@ -75,15 +78,11 @@
             <Columns>
                 <asp:CommandField ShowEditButton="True" HeaderText="Action Editing" />
                 <asp:CommandField ShowDeleteButton="True" HeaderText="Action Deleting"  />
-				<asp:TemplateField>
-					<%--<HeaderTemplate>
-						<asp:CheckBox ID="chkAll" runat="server" 
-						 onclick = "checkAll(this);" />
-					</HeaderTemplate> --%>
+				<asp:TemplateField HeaderText="Select">
 					<ItemTemplate>
-						 <asp:CheckBox ID="chkSelect" runat="server" />
+						<asp:CheckBox ID="checkboxdelete" runat="server" />
 					</ItemTemplate>
-				</asp:TemplateField> 
+				</asp:TemplateField>
                 <asp:BoundField DataField="ID" HeaderText="ID" ReadOnly="True" 
                     SortExpression="ID" />
                 <asp:TemplateField HeaderText="FirstName" SortExpression="FirstName">
@@ -104,10 +103,13 @@
                 </asp:TemplateField>
 				<asp:TemplateField HeaderText="DateOfBirth" SortExpression="LastName">
                     <EditItemTemplate>
-                        <asp:TextBox ID="grdDateOfBirth" runat="server" Text='<%# Bind("DateOfBirth") %>'></asp:TextBox>
+                        <asp:TextBox ID="grdDateOfBirth" runat="server" Text='<%# Bind("DateOfBirth","{0:dd/MM/yyyy}") %>'></asp:TextBox>
+						<ajaxToolkit:CalendarExtender ID="CalendarExtender2" runat="server" TargetControlID="grdDateOfBirth" 
+						 Format="dd/MM/yyyy">
+						</ajaxToolkit:CalendarExtender>
                     </EditItemTemplate>
                     <ItemTemplate>
-                        <asp:Label ID="lblgrdDateOfBirth" runat="server" Text='<%# Bind("DateOfBirth") %>'></asp:Label>
+                        <asp:Label ID="lblgrdDateOfBirth" runat="server" Text='<%# Bind("DateOfBirth","{0:dd/MM/yyyy}") %>'></asp:Label>
                     </ItemTemplate>
                 </asp:TemplateField>
 				<asp:TemplateField HeaderText="PhoneNumber" SortExpression="PhoneNumber">

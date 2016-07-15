@@ -60,7 +60,14 @@ namespace CRUD_ASP.NET
                 Response.Write(exception.Message);
             }
         }
-
+        private void ClearForm()
+        {
+            txtFristName.Text = string.Empty;
+            txtLastName.Text = string.Empty;
+            txtDateOfBirth.Text = string.Empty;
+            txtPhone.Text = string.Empty;
+            txtEmail.Text = string.Empty;
+        }
         protected void btnSave_Click(object sender, EventArgs e)
         {
             string firstName = txtFristName.Text;
@@ -236,24 +243,47 @@ namespace CRUD_ASP.NET
 
         protected void btnDelete_Click(object sender, EventArgs e)
         {
-            int count = 0;
-            grdStudentDetail.AllowPaging = false;
-            grdStudentDetail.DataBind();
-            ArrayList arr = (ArrayList)ViewState["SelectedRecords"];
-            count = arr.Count;
+
             for (int i = 0; i < grdStudentDetail.Rows.Count; i++)
             {
-                if (arr.Contains(grdStudentDetail.DataKeys[i].Value))
+                CheckBox checkboxdelete = ((CheckBox)grdStudentDetail.Rows[i].FindControl("checkboxdelete"));
+
+                if (checkboxdelete.Checked == true)
                 {
-                    DeleteRecord(grdStudentDetail.DataKeys[i].Value.ToString());
-                    arr.Remove(grdStudentDetail.DataKeys[i].Value);
+                    Label lblrollno = ((Label)grdStudentDetail.Rows[i].FindControl("lblrollno"));
+
+                    int rolNo = Convert.ToInt32(lblrollno.Text);
+                    SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["cn"].ConnectionString);
+                    SqlCommand cmd = new SqlCommand("delete from student where rollno = @rollno ", con);
+                    cmd.CommandType = CommandType.Text;
+
+                    SqlParameter param = new SqlParameter("@rollno", SqlDbType.Int);
+                    param.Value = rolNo;
+                    cmd.Parameters.Add(param);
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                    con.Close();
+                    cmd.Dispose();
                 }
-            }
-            ViewState["SelectedRecords"] = arr;
-            hfCount.Value = "0";
-            grdStudentDetail.AllowPaging = true;
-            GridViewBinding();
-            ShowMessage(count);
+            } 
+            //int count = 0;
+            //grdStudentDetail.AllowPaging = false;
+            //grdStudentDetail.DataBind();
+            //ArrayList arr = (ArrayList)ViewState["SelectedRecords"];
+            //count = arr.Count;
+            //for (int i = 0; i < grdStudentDetail.Rows.Count; i++)
+            //{
+            //    if (arr.Contains(grdStudentDetail.DataKeys[i].Value))
+            //    {
+            //        DeleteRecord(grdStudentDetail.DataKeys[i].Value.ToString());
+            //        arr.Remove(grdStudentDetail.DataKeys[i].Value);
+            //    }
+            //}
+            //ViewState["SelectedRecords"] = arr;
+            //hfCount.Value = "0";
+            //grdStudentDetail.AllowPaging = true;
+            //GridViewBinding();
+            //ShowMessage(count);
         }
 
         private void DeleteRecord(string CustomerID)
